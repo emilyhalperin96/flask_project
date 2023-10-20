@@ -1,8 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for, redirect
 
 app = Flask(__name__)
 posts = {
     0: {
+        'post_id': 0,
         'title': 'Hello, world',
         'content': 'This is my first blog post.'
     }
@@ -19,6 +20,20 @@ def post(post_id):
         return render_template('404.html', message = f"A post with id {post_id} was not found.")
     return render_template('post.html', post=post)
 
+@app.route('/post/form')
+def form():
+    return render_template('create.jinja2')
+
+@app.route('/post/create', methods=['POST'])
+def create_post():
+    title = request.form.get('title')
+    content = request.form.get('content')
+    post_id = len(posts)
+    posts[post_id] = {'id': post_id, 'title': title, 'content': content}
+
+    #takes in function name and returns an address that we want 
+    #takes the post function and returns the url 
+    return redirect(url_for('post', post_id=post_id))
 
 if __name__ == '__main__':
     app.run(debug=True)
